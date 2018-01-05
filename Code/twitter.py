@@ -1,5 +1,6 @@
 import nltk
 import re
+from math import*
 
 
 def stopwords():
@@ -36,43 +37,9 @@ def stopwords():
 
 
 def normalize_text(text):
-    # try:
-    #    text = text.encode('utf-8')
-    # except:
-    #    pass
     text = re.sub('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', '', text)
-    # text = re.sub('@[^\s]+', '', text)
-    # text = re.sub('#([^\s]+)', '', text)
-    text = re.sub('[:;>?<=*+()/,\-#!$%\{˜|\}\[^_\\@\]1234567890’‘]', ' ', text)
-    text = re.sub('[\d]', '', text)
-    text = text.replace(".", '')
-    text = text.replace("'", ' ')
-    text = text.replace("\"", ' ')
-    text = text.replace("-", " ")
-    text = text.replace("@", "")
-    text = text.replace("#", "")
-    text = text.replace("…", "")
-
-    # Normalize some utf8 encoding
-    text = text.replace("\x9d", ' ').replace("\x8c", ' ').replace("\xa0", ' ')
-    text = text.replace("\x9d\x92", ' ')
-    text = text.replace("\x9a\xaa\xf0\x9f\x94\xb5", ' ')
-    text = text.replace("\xf0\x9f\x91\x8d\x87\xba\xf0\x9f\x87\xb8", ' ')
-    text = text.replace("\x9f", ' ').replace("\x91\x8d", ' ')
-    text = text.replace("\xf0\x9f\x87\xba\xf0\x9f\x87\xb8", ' ')
-    text = text.replace("\xf0", ' ').replace('\xf0x9f', '')
-    text = text.replace("\x9f\x91\x8d", ' ').replace("\x87\xba\x87\xb8", ' ')
-    text = text.replace("\xe2\x80\x94", ' ').replace("\x9d\xa4", ' ')
-    text = text.replace("\x96\x91", ' ')
-    text = text.replace("\xe1\x91\xac\xc9\x8c\xce\x90\xc8\xbb\xef\xbb\x89" +
-                        "\xd4\xbc\xef\xbb\x89\xc5\xa0\xc5\xa0\xc2\xb8", ' ')
-    text = text.replace("\xe2\x80\x99s", " ").replace("\xe2\x80\x98", ' ')
-    text = text.replace("\xe2\x80\x99", ' ').replace("\xe2\x80\x9c", " ")
-    text = text.replace("\xe2\x80\x9d", " ")
-    text = text.replace("\xe2\x82\xac", " ").replace("\xc2\xa3", " ")
-    text = text.replace("\xc2\xa0", " ").replace("\xc2\xab", " ")
-    text = text.replace("\xf0\x9f\x94\xb4", " ")
-    text = text.replace("\xf0\x9f\x87\xba\xf0\x9f\x87\xb8\xf0\x9f", "")
+    text = re.sub('@[^\s]+', '', text)
+    text = re.sub('[^a-zA-Z\s]', '', text)
     return text
 
 
@@ -80,8 +47,9 @@ def nltk_tokenize(text):
     tokens = []
     features = []
     tokens = text.split()
+    stop_words = stopwords()
     for word in tokens:
-        if word.lower() not in stopwords() and len(word) > 2:
+        if word.lower() not in stop_words and len(word) > 2:
             features.append(word.lower())
     return features
 
@@ -98,6 +66,12 @@ def parse(filename):
             data[username] = []
         data[username].append(features)
     return data
+
+
+def jaccard_similarity(x, y):
+    intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
+    union_cardinality = len(set.union(*[set(x), set(y)]))
+    return intersection_cardinality/float(union_cardinality)
 
 
 def main():
