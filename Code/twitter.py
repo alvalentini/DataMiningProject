@@ -3,6 +3,13 @@ import re
 from math import*
 
 
+class Tweet:
+    def __init__(self, features, id, user):
+        self.features = features
+        self.id = id
+        self.user = user
+
+
 def stopwords():
     stop_words = nltk.corpus.stopwords.words('english')
     stop_words.extend(['this', 'that', 'the', 'might', 'have', 'been', 'from',
@@ -56,16 +63,17 @@ def nltk_tokenize(text):
 
 def parse(filename):
     file_object = open(filename, 'r')
-    data = {}
+    tweets = []
+    id = 0
     for line in file_object:
         username, text = line.split('\t\t')
-#        print(text)
         text = normalize_text(str(text))
         features = nltk_tokenize(text)
-        if username not in data:
-            data[username] = []
-        data[username].append(features)
-    return data
+        tweet = Tweet(features, id, username)
+        if len(features) > 0:
+            tweets.append(tweet)
+        id = id+1
+    return tweets
 
 
 def jaccard_similarity(x, y):
@@ -75,8 +83,9 @@ def jaccard_similarity(x, y):
 
 
 def main():
-    data = parse('tweets.txt')
-    print(data)
+    tweets = parse('tweets_50k.txt')
+    for tweet in tweets:
+        print(tweet.id, tweet.user, tweet.features)
 
 
 if __name__ == "__main__":
