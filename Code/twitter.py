@@ -4,6 +4,7 @@ import sys
 from math import*
 import numpy as np
 import scipy.cluster.hierarchy as hie
+import utils
 
 
 class Tweet:
@@ -67,6 +68,7 @@ def nltk_tokenize(stop_words, text):
 def parse(filename):
     file_object = open(filename, 'r')
     tweets = []
+    text_tweets = []
     stop_words = stopwords()
     id = 0
     for line in file_object:
@@ -76,10 +78,11 @@ def parse(filename):
         tweet = Tweet(features, id, username)
         if len(features) > 0:
             tweets.append(tweet)
+            text_tweets.append(features)
         id = id+1
         if id == 5000:
             break
-    return tweets
+    return tweets, text_tweets
 
 
 def jaccard_similarity(a, b):
@@ -91,15 +94,16 @@ def jaccard_similarity(a, b):
 
 
 def main():
-    tweets = parse('tweets_50k.txt')
+    tweets, text_tweets = parse('tweets_50k.txt')
     distances = []
-    for i in range(len(tweets)):
-        for j in range(i+1, len(tweets)):
-            sim = jaccard_similarity(tweets[i], tweets[j])
-            if sim == 0:
-                distances.append(float(sys.maxsize))
-            else:
-                distances.append(1/sim)
+    distances = utils.distances(text_tweets)
+   # for i in range(len(tweets)):
+   #     for j in range(i+1, len(tweets)):
+   #         sim = jaccard_similarity(tweets[i], tweets[j])
+   #         if sim == 0:
+   #             distances.append(float(sys.maxsize))
+   #         else:
+   #             distances.append(1/sim)
     Y = np.array(distances)
     Z = hie.linkage(Y)
     T = hie.fcluster(Z, t=4.0, criterion='distance')

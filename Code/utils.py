@@ -267,10 +267,240 @@ class StringVector(_object):
 StringVector_swigregister = _utils.StringVector_swigregister
 StringVector_swigregister(StringVector)
 
+class DoubleVector(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, DoubleVector, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, DoubleVector, name)
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        return _utils.DoubleVector_iterator(self)
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        return _utils.DoubleVector___nonzero__(self)
+
+    def __bool__(self):
+        return _utils.DoubleVector___bool__(self)
+
+    def __len__(self):
+        return _utils.DoubleVector___len__(self)
+
+    def __getslice__(self, i, j):
+        return _utils.DoubleVector___getslice__(self, i, j)
+
+    def __setslice__(self, *args):
+        return _utils.DoubleVector___setslice__(self, *args)
+
+    def __delslice__(self, i, j):
+        return _utils.DoubleVector___delslice__(self, i, j)
+
+    def __delitem__(self, *args):
+        return _utils.DoubleVector___delitem__(self, *args)
+
+    def __getitem__(self, *args):
+        return _utils.DoubleVector___getitem__(self, *args)
+
+    def __setitem__(self, *args):
+        return _utils.DoubleVector___setitem__(self, *args)
+
+    def pop(self):
+        return _utils.DoubleVector_pop(self)
+
+    def append(self, x):
+        return _utils.DoubleVector_append(self, x)
+
+    def empty(self):
+        return _utils.DoubleVector_empty(self)
+
+    def size(self):
+        return _utils.DoubleVector_size(self)
+
+    def swap(self, v):
+        return _utils.DoubleVector_swap(self, v)
+
+    def begin(self):
+        return _utils.DoubleVector_begin(self)
+
+    def end(self):
+        return _utils.DoubleVector_end(self)
+
+    def rbegin(self):
+        return _utils.DoubleVector_rbegin(self)
+
+    def rend(self):
+        return _utils.DoubleVector_rend(self)
+
+    def clear(self):
+        return _utils.DoubleVector_clear(self)
+
+    def get_allocator(self):
+        return _utils.DoubleVector_get_allocator(self)
+
+    def pop_back(self):
+        return _utils.DoubleVector_pop_back(self)
+
+    def erase(self, *args):
+        return _utils.DoubleVector_erase(self, *args)
+
+    def __init__(self, *args):
+        this = _utils.new_DoubleVector(*args)
+        try:
+            self.this.append(this)
+        except Exception:
+            self.this = this
+
+    def push_back(self, x):
+        return _utils.DoubleVector_push_back(self, x)
+
+    def front(self):
+        return _utils.DoubleVector_front(self)
+
+    def back(self):
+        return _utils.DoubleVector_back(self)
+
+    def assign(self, n, x):
+        return _utils.DoubleVector_assign(self, n, x)
+
+    def resize(self, *args):
+        return _utils.DoubleVector_resize(self, *args)
+
+    def insert(self, *args):
+        return _utils.DoubleVector_insert(self, *args)
+
+    def reserve(self, n):
+        return _utils.DoubleVector_reserve(self, n)
+
+    def capacity(self):
+        return _utils.DoubleVector_capacity(self)
+    __swig_destroy__ = _utils.delete_DoubleVector
+    __del__ = lambda self: None
+DoubleVector_swigregister = _utils.DoubleVector_swigregister
+DoubleVector_swigregister(DoubleVector)
+
+class VectorOfStringVector(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, VectorOfStringVector, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, VectorOfStringVector, name)
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        return _utils.VectorOfStringVector_iterator(self)
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        return _utils.VectorOfStringVector___nonzero__(self)
+
+    def __bool__(self):
+        return _utils.VectorOfStringVector___bool__(self)
+
+    def __len__(self):
+        return _utils.VectorOfStringVector___len__(self)
+
+    def __getslice__(self, i, j):
+        return _utils.VectorOfStringVector___getslice__(self, i, j)
+
+    def __setslice__(self, *args):
+        return _utils.VectorOfStringVector___setslice__(self, *args)
+
+    def __delslice__(self, i, j):
+        return _utils.VectorOfStringVector___delslice__(self, i, j)
+
+    def __delitem__(self, *args):
+        return _utils.VectorOfStringVector___delitem__(self, *args)
+
+    def __getitem__(self, *args):
+        return _utils.VectorOfStringVector___getitem__(self, *args)
+
+    def __setitem__(self, *args):
+        return _utils.VectorOfStringVector___setitem__(self, *args)
+
+    def pop(self):
+        return _utils.VectorOfStringVector_pop(self)
+
+    def append(self, x):
+        return _utils.VectorOfStringVector_append(self, x)
+
+    def empty(self):
+        return _utils.VectorOfStringVector_empty(self)
+
+    def size(self):
+        return _utils.VectorOfStringVector_size(self)
+
+    def swap(self, v):
+        return _utils.VectorOfStringVector_swap(self, v)
+
+    def begin(self):
+        return _utils.VectorOfStringVector_begin(self)
+
+    def end(self):
+        return _utils.VectorOfStringVector_end(self)
+
+    def rbegin(self):
+        return _utils.VectorOfStringVector_rbegin(self)
+
+    def rend(self):
+        return _utils.VectorOfStringVector_rend(self)
+
+    def clear(self):
+        return _utils.VectorOfStringVector_clear(self)
+
+    def get_allocator(self):
+        return _utils.VectorOfStringVector_get_allocator(self)
+
+    def pop_back(self):
+        return _utils.VectorOfStringVector_pop_back(self)
+
+    def erase(self, *args):
+        return _utils.VectorOfStringVector_erase(self, *args)
+
+    def __init__(self, *args):
+        this = _utils.new_VectorOfStringVector(*args)
+        try:
+            self.this.append(this)
+        except Exception:
+            self.this = this
+
+    def push_back(self, x):
+        return _utils.VectorOfStringVector_push_back(self, x)
+
+    def front(self):
+        return _utils.VectorOfStringVector_front(self)
+
+    def back(self):
+        return _utils.VectorOfStringVector_back(self)
+
+    def assign(self, n, x):
+        return _utils.VectorOfStringVector_assign(self, n, x)
+
+    def resize(self, *args):
+        return _utils.VectorOfStringVector_resize(self, *args)
+
+    def insert(self, *args):
+        return _utils.VectorOfStringVector_insert(self, *args)
+
+    def reserve(self, n):
+        return _utils.VectorOfStringVector_reserve(self, n)
+
+    def capacity(self):
+        return _utils.VectorOfStringVector_capacity(self)
+    __swig_destroy__ = _utils.delete_VectorOfStringVector
+    __del__ = lambda self: None
+VectorOfStringVector_swigregister = _utils.VectorOfStringVector_swigregister
+VectorOfStringVector_swigregister(VectorOfStringVector)
+
 
 def jaccard_similarity(a, b):
     return _utils.jaccard_similarity(a, b)
 jaccard_similarity = _utils.jaccard_similarity
+
+def distances(a):
+    return _utils.distances(a)
+distances = _utils.distances
 # This file is compatible with both classic and new-style classes.
 
 
