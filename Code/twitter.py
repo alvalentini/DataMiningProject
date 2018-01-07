@@ -80,8 +80,8 @@ def parse(filename):
             tweets.append(tweet)
             text_tweets.append(features)
         id = id+1
-        if id == 5000:
-            break
+        # if id == 5000:
+        #     break
     return tweets, text_tweets
 
 
@@ -95,20 +95,20 @@ def jaccard_similarity(a, b):
 
 def main():
     tweets, text_tweets = parse('tweets_50k.txt')
+    print('len(tweets) =', len(tweets))
     distances = []
     distances = utils.distances(text_tweets)
-   # for i in range(len(tweets)):
-   #     for j in range(i+1, len(tweets)):
-   #         sim = jaccard_similarity(tweets[i], tweets[j])
-   #         if sim == 0:
-   #             distances.append(float(sys.maxsize))
-   #         else:
-   #             distances.append(1/sim)
+    # for i in range(len(tweets)):
+    #     for j in range(i+1, len(tweets)):
+    #         sim = jaccard_similarity(tweets[i], tweets[j])
+    #         if sim == 0:
+    #             distances.append(float(sys.maxsize))
+    #         else:
+    #             distances.append(1/sim)
     Y = np.array(distances)
     Z = hie.linkage(Y)
     T = hie.fcluster(Z, t=4.0, criterion='distance')
     np.set_printoptions(threshold=np.nan)
-    print('len(tweets) =', len(tweets))
     print('len(Y) =', len(Y))
     print('len(T) =', len(T))
     for i in range(len(T)):

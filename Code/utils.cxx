@@ -1,10 +1,11 @@
 #include <algorithm>
 #include <set>
 #include <limits>
+#include <iostream>
 
 #include "utils.h"
 
-double jaccard_similarity(std::vector<std::string> a, std::vector<std::string> b) {
+double jaccard_similarity(const std::vector<std::string>& a, const std::vector<std::string>& b) {
     std::set<std::string> intersect;
     std::set<std::string> unionset;
     std::set_intersection (a.begin(), a.end(), b.begin(), b.end(), std::inserter(intersect, intersect.begin()));
@@ -14,6 +15,7 @@ double jaccard_similarity(std::vector<std::string> a, std::vector<std::string> b
 
 std::vector<double> distances(std::vector<std::vector<std::string> > a) {
     std::vector<double> res;
+    size_t c = 0;
     for (size_t i=0; i<a.size(); i++) {
         for (size_t j=i+1; j<a.size(); j++) {
             double sim = jaccard_similarity(a[i], a[j]);
@@ -22,6 +24,10 @@ std::vector<double> distances(std::vector<std::vector<std::string> > a) {
             }
             else {
                 res.push_back(1/sim);
+            }
+            c++;
+            if (c % 1000000 == 0) {
+              std::cout << "Computed " << c << " jaccard similarity" << std::endl;
             }
         }
     }
