@@ -9,8 +9,14 @@ double jaccard_similarity(const std::vector<std::string>& a, const std::vector<s
     std::set<std::string> intersect;
     std::set<std::string> unionset;
     std::set_intersection (a.begin(), a.end(), b.begin(), b.end(), std::inserter(intersect, intersect.begin()));
-    std::set_union (a.begin(), a.end(), b.begin(), b.end(), std::inserter(unionset, unionset.begin()));
-    return intersect.size()/(double)unionset.size();
+    size_t int_size = intersect.size();
+    if (int_size == 0) {
+        return 0.;
+    }
+    else {
+        std::set_union (a.begin(), a.end(), b.begin(), b.end(), std::inserter(unionset, unionset.begin()));
+        return int_size/(double)unionset.size();
+    }
 }
 
 std::vector<double> distances(std::vector<std::vector<std::string> > a) {
