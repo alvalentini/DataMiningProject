@@ -1,9 +1,5 @@
 import nltk
 import re
-import sys
-from math import*
-import numpy as np
-import scipy.cluster.hierarchy as hie
 import utils
 
 
@@ -98,36 +94,21 @@ def main():
     tweets_len = len(tweets)
     print('len(tweets) =', tweets_len)
 
-    similarities = []
-    distances = utils.distances(text_tweets)
-    print("C++ call ended")
+    T = utils.clustering(text_tweets, 4)
 
-    d = 0
-    for i in range(tweets_len):
-        for j in range(i + 1, tweets_len):
-            d = d + 1
-            if d % 1000000 == 0:
-                print(d)
-            similarities.append(float(sys.maxsize))
-    print("resetted to zero")
-
-    for k, v in distances.items():
-        i, j = k.split(';')
-        i = int(i)
-        j = int(j)
-        index = ((i+1) * tweets_len) - ((((i+1)*(i+1)) + (i+1)) / 2) - (tweets_len - j)
-        similarities[int(index)] = v
-    print('end')
-
-    Y = np.array(similarities)
-    Z = hie.linkage(Y)
-    T = hie.fcluster(Z, t=4.0, criterion='distance')
-
-    np.set_printoptions(threshold=np.nan)
-    print('len(Y) =', len(Y))
-    print('len(T) =', len(T))
+    cluster_list = []
     for i in range(len(T)):
-        print(i+1, T[i], tweets[i].features)
+        cluster_list.append((i, T[i]))
+    cluster_list.sort(key=lambda x: x[1])
+
+    last_t = -1
+    for i, t in cluster_list:
+        if (t != last_t):
+            print()
+        print(t, i, tweets[i].features)
+        last_t = t
+
+    print('\nnumber of cluster', len(set(T)))
 
 
 if __name__ == "__main__":

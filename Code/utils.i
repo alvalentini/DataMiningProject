@@ -7,9 +7,14 @@
 %include "std_map.i"
 %include "std_string.i"
 
+%inline %{
+  typedef long unsigned int size_t;
+%}
+
 namespace std {
    %template(StringVector) vector<string>;
    %template(DoubleVector) vector<double>;
+   %template(VecSize) vector<size_t>;
    %template(VectorOfStringVector) vector<vector<string> >;
    %template(map_string_double) map<string, double>;
 }
