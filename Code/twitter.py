@@ -80,8 +80,8 @@ def parse(filename):
             tweets.append(tweet)
             text_tweets.append(features)
         id = id+1
-        # if id == 5000:
-        #    break
+        if id == 5000:
+            break
     return tweets, text_tweets
 
 
@@ -95,21 +95,38 @@ def jaccard_similarity(a, b):
 
 def main():
     tweets, text_tweets = parse('tweets_50k.txt')
-    print('len(tweets) =', len(tweets))
+    tweets_len = len(tweets)
+    print('len(tweets) =', tweets_len)
     similarities = []
     distances = utils.distances(text_tweets)
-    for i in range(len(tweets)):
-        for j in range(i+1, len(tweets)):
-            key = str(i)+';'+str(j)
-            if key in distances:
-                sim = distances[key]
-            else:
-                sim = 0
-            # sim = jaccard_similarity(tweets[i], tweets[j])
-            if sim == 0:
-                similarities.append(float(sys.maxsize))
-            else:
-                similarities.append(1/sim)
+    print("C++ call ended")
+    d = 0
+	
+    for i in range(tweets_len):
+        for j in range(i + 1, tweets_len):
+            d = d + 1
+            if d % 1000000 == 0:
+                print(d)
+            similarities.append(float(sys.maxsize))
+    print("resetted to zero")
+    d = 0
+    for k, v in distances.items():
+        i, j = k.split(';')
+        index = (i + 1) * tweets_len - (((j + 1)**2) / 2.0) - (j + 1 / 2.0) - (tweets_len - j + 1)
+        similarities[index] = 1/v
+        #    d = d + 1
+         #   if d % 1000000 == 0:
+          #      print(d)
+           # key = str(i)+';'+str(j)
+            #if key in distances:
+        #        sim = distances[key]
+         #   else:
+          #      sim = 0
+           # # sim = jaccard_similarity(tweets[i], tweets[j])
+            #if sim == 0:
+             #   similarities.append(float(sys.maxsize))
+            #else:
+             #   similarities.append(1/sim)
     print('end')
     Y = np.array(similarities)
     Z = hie.linkage(Y)
