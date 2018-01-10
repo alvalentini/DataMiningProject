@@ -11,7 +11,7 @@ def jaccard_similarity(a, b):
 
 
 def main():
-    tweets, text_tweets = cf.parse('tweets.txt')
+    tweets, text_tweets = cf.parse('../Dataset/tweets.txt')
     tweets_len = len(tweets)
     print('len(tweets) =', tweets_len)
 

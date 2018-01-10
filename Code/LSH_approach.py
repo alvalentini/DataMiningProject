@@ -93,7 +93,7 @@ def compute_minHash(matrix, hashIterations):
 
 
 def main():
-    tweets, text_tweets = cf.parse('tweets_50k.txt')
+    tweets, text_tweets = cf.parse('../Dataset/tweets_50k.txt')
     print('len(tweets) =', len(tweets))
 
     words = dictionary_creation(tweets)
