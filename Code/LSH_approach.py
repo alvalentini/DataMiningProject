@@ -5,7 +5,7 @@ import sys
 import operator
 import common_functions as cf
 import itertools as it
-import utils
+import utils as ut
 
 # from nltk.stem import PorterStemmer
 # from nltk.tokenize import sent_tokenize, word_tokenize
@@ -136,7 +136,7 @@ def compute_minHash(matrix, hashIterations):
 
 
 def main():
-    tweets, text_tweets = cf.parse('../Dataset/tweets_50k.txt')
+    tweets, text_tweets = cf.parse('../Dataset/tweets_A.txt')
     # tweets = tweets[:5000]
     print('len(tweets) =', len(tweets))
 
@@ -153,7 +153,7 @@ def main():
     k = 100000000
     #if b*r==signature_matrix.shape[0]:
     candidates = get_candidates_lsh(signature_matrix, b, r, k)
-    T = utils.clustering_lsh(text_tweets, candidates, 7)
+    T = ut.clustering_lsh(text_tweets, candidates, 3)
     cluster_list = []
     for i in range(len(T)):
         cluster_list.append((i, T[i]))
@@ -167,6 +167,18 @@ def main():
         last_t = t
 
     print('\nnumber of cluster', len(set(T)))
+    clusters = {}
+    for tweet_cluster in cluster_list:
+        if not tweet_cluster[1] in clusters:
+            clusters[tweet_cluster[1]] = [tweet_cluster[0]]
+        else:
+            clusters[tweet_cluster[1]].append(tweet_cluster[0])
+    meaningful_clusters = dict(clusters)
+    for key in clusters.keys():
+        if len(clusters[key])<10:
+            del meaningful_clusters[key]
+    for tweet in meaningful_clusters[4627]:
+        print (tweets[tweet].features)
     #else:
     #    print("Wrong b and c parameters")
     
