@@ -4,6 +4,9 @@ import random
 import sys
 import operator
 import common_functions as cf
+import itertools as it
+import utils
+
 # from nltk.stem import PorterStemmer
 # from nltk.tokenize import sent_tokenize, word_tokenize
 
@@ -60,10 +63,50 @@ def generate_signatures(matrix, rows_hashes):
                         signature_matrix[hash_index, tweet] = hash_value
             if matrix[word, tweet] == 0:
                 print("THERE IS SOMETHING WRONG" + str(tweet))
-        if tweet % 100 == 0:
+        if tweet % 1000 == 0:
             print("i finished computing minhash of tweet number:" + str(tweet))
     return signature_matrix
+    
 
+def extract_candidates_from_buckets(buckets):
+    candidates=[]
+    
+    i=0
+    for bucket in buckets:
+        for hash_list in bucket.values():            
+            pairs =list(it.combinations(hash_list,2))
+            strings = list()
+            for pair in pairs:
+                strings.append(";".join(str(x) for x in pair))
+            
+            candidates += strings
+        i+=1
+        print ("Bucket " + str(i) + " done")
+    candidates_set = set(candidates)
+    candidates_list = list(candidates_set)
+    return candidates_list
+  
+def get_candidates_lsh(signature_matrix, b, r, k):
+    buckets = []
+    n_tweets = signature_matrix.shape[1]
+    n_hashes = signature_matrix.shape[0]
+    row = 0
+    for band in range(b):
+        hashtable = {}
+        for tweet in range(n_tweets):
+            hashvalue = hash(tuple(signature_matrix[row:row+r,tweet])) % k
+            if hashvalue in hashtable:
+                hashtable[hashvalue].append(tweet)
+            else:
+                hashtable[hashvalue] = [tweet]
+        row += r
+        buckets.append(hashtable)
+    print ("Buckets done")
+    candidates = extract_candidates_from_buckets(buckets)
+    print ("LSH finished computing")
+    return list(candidates)
+    #similarity_threshold = 10
+    
 
 # NOTE: obsolete function, minhash is here
 # implemented without the approximation trick
@@ -94,6 +137,7 @@ def compute_minHash(matrix, hashIterations):
 
 def main():
     tweets, text_tweets = cf.parse('../Dataset/tweets_50k.txt')
+    # tweets = tweets[:5000]
     print('len(tweets) =', len(tweets))
 
     words = dictionary_creation(tweets)
@@ -104,6 +148,28 @@ def main():
     n_hashFunctions = 100
     rows_hashes = generate_hashFunctions(n_hashFunctions, matrix.shape[0])
     signature_matrix = generate_signatures(matrix, rows_hashes)
+    b = 50
+    r = 2
+    k = 100000000
+    #if b*r==signature_matrix.shape[0]:
+    candidates = get_candidates_lsh(signature_matrix, b, r, k)
+    T = utils.clustering_lsh(text_tweets, candidates, 7)
+    cluster_list = []
+    for i in range(len(T)):
+        cluster_list.append((i, T[i]))
+    cluster_list.sort(key=lambda x: x[1])
+
+    last_t = -1
+    for i, t in cluster_list:
+        if (t != last_t):
+            print()
+        print(t, i, tweets[i].features)
+        last_t = t
+
+    print('\nnumber of cluster', len(set(T)))
+    #else:
+    #    print("Wrong b and c parameters")
+    
     # signature_matrix = generate_signatures_with_sorted_rows(matrix, rows_)
     # signature_matrix = compute_minHash(matrix, hashIterations)
 
