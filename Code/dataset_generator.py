@@ -3,7 +3,7 @@ from random import randint
 
 source_dataset_size = 0
 destination_dataset_size = 500000
-destination_dataset_name = 'tweets_J.txt'
+destination_dataset_name = 'tweets_D.txt'
 
 
 file_object = open('/mnt/c/Users/Davide/Desktop/tweet_text_02.csv', 'r')

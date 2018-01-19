@@ -37,7 +37,10 @@ def stopwords():
                        'shit', 'via', 'fucking', 'shocker', 'wtf', 'hey',
                        'ooh', 'rtamp', 'amp', 'retweet',
                        'fucks', 'fucka', 'bitch', 'wey',
-                       'lol', 'smfh'])
+                       'lol', 'smfh',
+                       'done', 'ugh', 'good', 'okay', 'please', 'dont', 'omg', 'thats', 'thing', 'less', 'want', 'ive', 'shits', 'ahw', 'hello', 'oki', 'yes', 'try', 'never', 'kool', 'ahah', 'stuff',
+                       'gets', 'damn', 'nah', 'nope', 'btw', 'haha', 'lmfao', 'cuz', 'umm', 'lolol', 'pls', 'cmon', 'soo', 'wow'
+                       ])
     stop_words = set(stop_words)
     stop_words = [x for x in stop_words if len(x) > 2]
     return stop_words
@@ -55,7 +58,9 @@ def nltk_tokenize(stop_words, text):
     features = []
     tokens = text.split()
     for word in tokens:
-        if word.lower() not in stop_words and len(word) > 2:
+        word_lower = word.lower()
+        word_len = len(word)
+        if word_lower not in stop_words and word_len > 2 and word_len < 20 and not bool(re.match('.*(a{3,}|b{3,}|c{3,}|d{3,}|e{3,}|f{3,}|g{3,}|h{3,}|i{3,}|j{3,}|k{3,}|l{3,}|m{3,}|n{3,}|o{3,}|p{3,}|q{3,}|r{3,}|s{3,}|t{3,}|u{3,}|v{3,}|w{3,}|x{3,}|y{3,}|z{3,}).*', word_lower)):
             features.append(word.lower())
     return features
 
@@ -75,6 +80,6 @@ def parse(filename):
             tweets.append(tweet)
             text_tweets.append(features)
             id = id+1
-        if id == 5000:
+        if id == 200000:
             break
     return tweets, text_tweets

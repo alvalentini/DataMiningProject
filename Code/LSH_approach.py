@@ -82,9 +82,9 @@ def extract_candidates_from_buckets(buckets):
             candidates += strings
         i += 1
         print("Bucket " + str(i) + " done")
-    candidates_set = set(candidates)
-    candidates_list = list(candidates_set)
-    return candidates_list
+        candidates_set = set(candidates)
+        candidates = list(candidates_set)
+    return candidates
 
 
 def get_candidates_lsh(signature_matrix, b, r, k):
@@ -151,11 +151,11 @@ def main():
     signature_matrix = generate_signatures(matrix, rows_hashes)
     b = 50
     r = 2
-    k = 100000000
+    k = 1000000000
     # if b*r==signature_matrix.shape[0]:
     candidates = get_candidates_lsh(signature_matrix, b, r, k)
     print('ciao Damiano')
-    T = ut.clustering_lsh(text_tweets, candidates, 3)
+    T = ut.clustering_lsh(text_tweets, candidates, 5)
     cluster_list = []
     for i in range(len(T)):
         cluster_list.append((i, T[i]))
