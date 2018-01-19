@@ -66,26 +66,27 @@ def generate_signatures(matrix, rows_hashes):
         if tweet % 1000 == 0:
             print("i finished computing minhash of tweet number:" + str(tweet))
     return signature_matrix
-    
+
 
 def extract_candidates_from_buckets(buckets):
-    candidates=[]
-    
-    i=0
+    candidates = []
+
+    i = 0
     for bucket in buckets:
-        for hash_list in bucket.values():            
-            pairs =list(it.combinations(hash_list,2))
+        for hash_list in bucket.values():
+            pairs = list(it.combinations(hash_list, 2))
             strings = list()
             for pair in pairs:
                 strings.append(";".join(str(x) for x in pair))
-            
+
             candidates += strings
-        i+=1
-        print ("Bucket " + str(i) + " done")
+        i += 1
+        print("Bucket " + str(i) + " done")
     candidates_set = set(candidates)
     candidates_list = list(candidates_set)
     return candidates_list
-  
+
+
 def get_candidates_lsh(signature_matrix, b, r, k):
     buckets = []
     n_tweets = signature_matrix.shape[1]
@@ -94,19 +95,19 @@ def get_candidates_lsh(signature_matrix, b, r, k):
     for band in range(b):
         hashtable = {}
         for tweet in range(n_tweets):
-            hashvalue = hash(tuple(signature_matrix[row:row+r,tweet])) % k
+            hashvalue = hash(tuple(signature_matrix[row:row+r, tweet])) % k
             if hashvalue in hashtable:
                 hashtable[hashvalue].append(tweet)
             else:
                 hashtable[hashvalue] = [tweet]
         row += r
         buckets.append(hashtable)
-    print ("Buckets done")
+    print("Buckets done")
     candidates = extract_candidates_from_buckets(buckets)
-    print ("LSH finished computing")
+    print("LSH finished computing")
     return list(candidates)
-    #similarity_threshold = 10
-    
+    # similarity_threshold = 10
+
 
 # NOTE: obsolete function, minhash is here
 # implemented without the approximation trick
@@ -151,8 +152,9 @@ def main():
     b = 50
     r = 2
     k = 100000000
-    #if b*r==signature_matrix.shape[0]:
+    # if b*r==signature_matrix.shape[0]:
     candidates = get_candidates_lsh(signature_matrix, b, r, k)
+    print('ciao Damiano')
     T = ut.clustering_lsh(text_tweets, candidates, 3)
     cluster_list = []
     for i in range(len(T)):
@@ -175,13 +177,11 @@ def main():
             clusters[tweet_cluster[1]].append(tweet_cluster[0])
     meaningful_clusters = dict(clusters)
     for key in clusters.keys():
-        if len(clusters[key])<10:
+        if len(clusters[key]) < 10:
             del meaningful_clusters[key]
-    for tweet in meaningful_clusters[4627]:
-        print (tweets[tweet].features)
-    #else:
+    # else:
     #    print("Wrong b and c parameters")
-    
+
     # signature_matrix = generate_signatures_with_sorted_rows(matrix, rows_)
     # signature_matrix = compute_minHash(matrix, hashIterations)
 
