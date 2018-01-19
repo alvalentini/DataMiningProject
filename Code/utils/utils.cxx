@@ -106,3 +106,70 @@ vector<size_t> clustering(vector<vector<string> > a, int max_d) {
   cout << "end" << endl;
   return res;
 }
+
+vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, int max_d) {
+  map<double, set<pair<size_t, size_t> > > distances;
+  size_t c1 = 0;
+  size_t c2 = 0;
+  for (size_t i=0; i<a.size(); i++) {
+    for (size_t j=i+1; j<a.size(); j++) {
+      ostringstream ss;
+      ss << i << ";" << j;
+      if (pairs.find(ss.str()) != pairs.end()) {
+        double sim = jaccard_similarity(a[i], a[j]);
+        if (sim != 0) {
+          double d = 1/sim;
+          pair<size_t, size_t> p = make_pair(i, j);
+          auto it = distances.find(d);
+          if (it == distances.end()) {
+            set<pair<size_t, size_t> > s;
+            s.insert(p);
+            distances[d] = s;
+          }
+          else {
+            it->second.insert(p);
+          }
+          c2++;
+        }
+        c1++;
+      }
+      if (c1 % 1000000 == 0) {
+        cout << "Computed " << c1 << " jaccard similarities" << endl;
+      }
+    }
+  }
+  cout << "All distances computed! " << c2 << ", "
+       << distances.size() << endl;
+  vector<size_t> res;
+  for (size_t i=0; i<a.size(); i++) {
+    res.push_back(i);
+  }
+  while(distances.size() > 0) {
+    auto distances_it = distances.begin();
+    size_t d = distances_it->first;
+    if (d <= max_d) {
+      set<pair<size_t, size_t> >& s = distances_it->second;
+      auto it = s.begin();
+      s.erase(it);
+      pair<size_t, size_t> p = *it;
+      if (s.size() == 0) {
+        distances.erase(distances_it);
+      }
+      size_t i = p.first;
+      size_t j = p.second;
+      size_t r = res[j];
+      if (r != res[i]) {
+        for (size_t k=0; k<res.size(); k++) {
+          if (res[k] == r) {
+            res[k] = res[i];
+          }
+        }
+      }
+    }
+    else {
+      break;
+    }
+  }
+  cout << "end" << endl;
+  return res;
+}
