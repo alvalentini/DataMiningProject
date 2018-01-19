@@ -132,9 +132,9 @@ vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, int 
           c2++;
         }
         c1++;
-      }
-      if (c1 % 1000000 == 0) {
-        cout << "Computed " << c1 << " jaccard similarities" << endl;
+        if (c1 % 1000000 == 0) {
+          cout << "Computed " << c1 << " jaccard similarities" << endl;
+        }
       }
     }
   }
