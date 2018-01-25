@@ -79,7 +79,7 @@ def parse(filename, num=5000):
         text = normalize_text(str(text))
         features = nltk_tokenize(stop_words, text)
         tweet = Tweet(features, id, username)
-        if len(features) > 0:
+        if len(features) > 2:
             tweets.append(tweet)
             text_tweets.append(features)
             id = id+1

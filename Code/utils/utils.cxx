@@ -58,14 +58,14 @@ map<string, double> distances(vector<vector<string> > a) {
   return res;
 }
 
-vector<size_t> clustering(vector<vector<string> > a, int max_d) {
+vector<size_t> clustering(vector<vector<string> > a, double max_d) {
   map<double, set<pair<size_t, size_t> > > distances;
   size_t c1 = 0;
   size_t c2 = 0;
   for (size_t i=0; i<a.size(); i++) {
     for (size_t j=i+1; j<a.size(); j++) {
       double sim = jaccard_similarity(a[i], a[j]);
-      if (sim != 0) {
+      if (sim != 0 && sim >= 1/max_d) {
         double d = 1/sim;
         pair<size_t, size_t> p = make_pair(i, j);
         auto it = distances.find(d);
@@ -121,7 +121,7 @@ vector<size_t> clustering(vector<vector<string> > a, int max_d) {
   return res;
 }
 
-vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, int max_d) {
+vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, double max_d) {
   map<double, set<pair<size_t, size_t> > > distances;
   size_t c1 = 0;
   size_t c2 = 0;
@@ -141,7 +141,7 @@ vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, int 
     i = vect[0];
     j = vect[1];
     double sim = jaccard_similarity(a[i], a[j]);
-    if (sim != 0) {
+    if (sim != 0 && sim >= 1/max_d) {
       double d = 1/sim;
       pair<size_t, size_t> p = make_pair(i, j);
       auto it = distances.find(d);
