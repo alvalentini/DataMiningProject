@@ -10,6 +10,20 @@
 
 using namespace std;
 
+double similarity(vector<string> a, vector<string> b) {
+  set<string> intersect;
+  set<string> unionset;
+  set_intersection (a.begin(), a.end(), b.begin(), b.end(), inserter(intersect, intersect.begin()));
+  size_t int_size = intersect.size();
+  if (int_size == 0) {
+    return 0.;
+  }
+  else {
+    set_union (a.begin(), a.end(), b.begin(), b.end(), inserter(unionset, unionset.begin()));
+    return int_size/(double)unionset.size();
+  }
+}
+
 double jaccard_similarity(const vector<string>& a, const vector<string>& b) {
   set<string> intersect;
   set<string> unionset;

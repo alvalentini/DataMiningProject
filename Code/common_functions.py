@@ -38,9 +38,12 @@ def stopwords():
                        'ooh', 'rtamp', 'amp', 'retweet',
                        'fucks', 'fucka', 'bitch', 'wey',
                        'lol', 'smfh',
-                       'done', 'ugh', 'good', 'okay', 'please', 'dont', 'omg', 'thats', 'thing', 'less', 'want', 'ive', 'shits', 'ahw', 'hello', 'oki', 'yes', 'try', 'never', 'kool', 'ahah', 'stuff',
-                       'gets', 'damn', 'nah', 'nope', 'btw', 'haha', 'lmfao', 'cuz', 'umm', 'lolol', 'pls', 'cmon', 'soo', 'wow'
-                       ])
+                       'done', 'ugh', 'good', 'okay', 'please', 'dont', 'omg',
+                       'thats', 'thing', 'less', 'want', 'ive', 'shits', 'ahw',
+                       'hello', 'oki', 'yes', 'try', 'never', 'kool', 'ahah',
+                       'stuff', 'gets', 'damn', 'nah', 'nope', 'btw', 'haha',
+                       'lmfao', 'cuz', 'umm', 'lolol', 'pls', 'cmon', 'soo',
+                       'wow'])
     stop_words = set(stop_words)
     stop_words = [x for x in stop_words if len(x) > 2]
     return stop_words
@@ -49,7 +52,7 @@ def stopwords():
 def normalize_text(text):
     text = re.sub('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', '', text)
     text = re.sub('@[^\s]+', '', text)
-    text = re.sub('[^a-zA-Z\s]', '', text)
+    text = re.sub('[^a-zA-Z\s]', ' ', text)
     return text
 
 
@@ -65,7 +68,7 @@ def nltk_tokenize(stop_words, text):
     return features
 
 
-def parse(filename):
+def parse(filename, num=5000):
     file_object = open(filename, 'r')
     tweets = []
     text_tweets = []
@@ -80,6 +83,6 @@ def parse(filename):
             tweets.append(tweet)
             text_tweets.append(features)
             id = id+1
-        if id == 200000:
+        if id == num:
             break
     return tweets, text_tweets
