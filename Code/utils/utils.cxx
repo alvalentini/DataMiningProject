@@ -85,8 +85,7 @@ vector<size_t> clustering(vector<vector<string> > a, double max_d) {
       }
     }
   }
-  cout << "All distances computed! " << c2 << ", "
-       << distances.size() << endl;
+  cout << "All distances computed! " << c2 << endl;
   vector<size_t> res;
   for (size_t i=0; i<a.size(); i++) {
     res.push_back(i);
@@ -117,7 +116,7 @@ vector<size_t> clustering(vector<vector<string> > a, double max_d) {
       break;
     }
   }
-  cout << "end" << endl;
+  cout << "End C++" << endl << endl;
   return res;
 }
 
