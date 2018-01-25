@@ -1,1 +1,0 @@
-In this directory we put the files about the paper
