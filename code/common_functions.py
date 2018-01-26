@@ -57,7 +57,7 @@ def normalize_text(text):
     return text
 
 
-def nltk_tokenize(stop_words, text):
+def nltk_tokenize(stop_words, text, ps):
     tokens = []
     features = []
     tokens = text.split()
@@ -65,7 +65,7 @@ def nltk_tokenize(stop_words, text):
         word_lower = word.lower()
         word_len = len(word)
         if word_lower not in stop_words and word_len > 2 and word_len < 20 and not bool(re.match('.*(a{3,}|b{3,}|c{3,}|d{3,}|e{3,}|f{3,}|g{3,}|h{3,}|i{3,}|j{3,}|k{3,}|l{3,}|m{3,}|n{3,}|o{3,}|p{3,}|q{3,}|r{3,}|s{3,}|t{3,}|u{3,}|v{3,}|w{3,}|x{3,}|y{3,}|z{3,}).*', word_lower)):
-            features.append(word.lower())
+            features.append(ps.stem(word.lower()))
     return features
 
 
@@ -75,10 +75,11 @@ def parse(filename, num=5000):
     text_tweets = []
     stop_words = stopwords()
     id = 0
+    ps = nltk.PorterStemmer()
     for line in file_object:
         username, text = line.split('\t\t')
         text = normalize_text(str(text))
-        features = nltk_tokenize(stop_words, text)
+        features = nltk_tokenize(stop_words, text, ps)
         tweet = Tweet(features, id, username)
         if len(features) > 2:
             tweets.append(tweet)
