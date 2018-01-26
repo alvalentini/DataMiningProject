@@ -98,8 +98,10 @@ def evaluation(cluster, tweets):
         v_len = len(v)
         tweets_num += v_len
         cluster_tweets = []
+        cluster_users = set([])
         for t in v:
             cluster_tweets.append(tweets[t].features)
+            cluster_users.add(tweets[t].user)
         sim = 0
         d = 0
         map = {}
@@ -116,7 +118,7 @@ def evaluation(cluster, tweets):
         for w, f in map.items():
             if f >= v_len*(2/3):
                 cluster_words.append(w)
-        clusters.append((k, cluster_words, v_len, dist, 0))
+        clusters.append((k, cluster_words, v_len, dist, 0, cluster_users))
 
     # Compute the smaller external distance
     c_len = len(clusters)
@@ -124,15 +126,16 @@ def evaluation(cluster, tweets):
         for j in range(i+1, c_len):
             sim = utils.similarity(clusters[i][1], clusters[j][1])
             if sim > clusters[i][4]:
-                clusters[i] = clusters[i][0], clusters[i][1], clusters[i][2], clusters[i][3], 1/sim
+                clusters[i] = clusters[i][0], clusters[i][1], clusters[i][2], clusters[i][3], 1/sim, clusters[i][5]
             if sim > clusters[j][4]:
-                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim
+                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim, clusters[i][5]
 
     # Print results
     bugs = 0
     for i in range(c_len):
         print('Cluster:', clusters[i][0])
         print(clusters[i][1])
+        print(clusters[i][5])
         print('cluster size:', clusters[i][2])
         print('average internal distance:', '%.1f' % clusters[i][3])
         if clusters[i][4] == 0:
@@ -148,3 +151,6 @@ def evaluation(cluster, tweets):
     print('number of clusters =', c_len)
     print('tweets in the clusters =', tweets_num)
     print('bugs =', bugs)
+    print()
+
+    return clusters
