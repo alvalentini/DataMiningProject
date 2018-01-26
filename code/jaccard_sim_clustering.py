@@ -17,7 +17,7 @@ def main():
     tweets_len = args.tweets_number[0]
 
     # Parse tweets
-    tweets, text_tweets = cf.parse('../Dataset/tweets_A.txt', tweets_len)
+    tweets, text_tweets = cf.parse('../data/tweets_A.txt', tweets_len)
     tweets_len = len(tweets)
     print('len(tweets) =', tweets_len)
 
