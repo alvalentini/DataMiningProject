@@ -1,6 +1,7 @@
 *~
 utils.py
 tweets_2xuser.txt
+tweets_2xuser_time_all.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
