@@ -67,24 +67,24 @@ def generate_signatures(matrix, rows_hashes):
             print("i finished computing minhash of tweet number:" + str(tweet))
     return signature_matrix
 
-
-def extract_candidates_from_buckets(buckets):
-    candidates = []
-
-    i = 0
+    
+def extract_buckets_to_combine(buckets):            
+    tuples = set()
     for bucket in buckets:
         for hash_list in bucket.values():
-            pairs = list(it.combinations(hash_list, 2))
-            strings = list()
-            for pair in pairs:
-                strings.append(";".join(str(x) for x in pair))
-
-            candidates += strings
-        i += 1
-        print("Bucket " + str(i) + " done")
-        candidates_set = set(candidates)
-        candidates = list(candidates_set)
-    return candidates
+            if len(hash_list)>1:
+                tuples.add(tuple(hash_list))
+    lists = []
+    for t in tuples:
+        lists.append(list(t))
+        
+    res = []
+    for l in lists:
+        string_list = []
+        for number in l:
+            string_list.append(str(number))
+        res.append(string_list)
+    return res
 
 
 def get_candidates_lsh(signature_matrix, b, r, k):
@@ -103,9 +103,10 @@ def get_candidates_lsh(signature_matrix, b, r, k):
         row += r
         buckets.append(hashtable)
     print("Buckets done")
-    candidates = extract_candidates_from_buckets(buckets)
-    print("LSH finished computing")
-    return list(candidates)
+
+    candidates_lists_to_combine = extract_buckets_to_combine(buckets)
+    return candidates_lists_to_combine
+    
     # similarity_threshold = 10
 
 
@@ -152,10 +153,11 @@ def main():
     b = 50
     r = 2
     k = 1000000000
-    # if b*r==signature_matrix.shape[0]:
-    candidates = get_candidates_lsh(signature_matrix, b, r, k)
-    print('ciao Damiano')
-    T = ut.clustering_lsh(text_tweets, candidates, 5)
+
+    candidates_lists = get_candidates_lsh(signature_matrix, b, r, k)
+    
+    T = ut.clustering_lsh(text_tweets, candidates_lists, 5)
+
     cluster_list = []
     for i in range(len(T)):
         cluster_list.append((i, T[i]))
