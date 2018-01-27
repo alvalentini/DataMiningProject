@@ -1,1 +1,1 @@
-In this directory we put the files about the paper
+The paper is being written on ShareLatex, please follow [this link](https://www.overleaf.com/read/krcfdvttnzmz) to view the current version.

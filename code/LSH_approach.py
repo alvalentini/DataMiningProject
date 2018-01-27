@@ -137,7 +137,7 @@ def compute_minHash(matrix, hashIterations):
 
 
 def main():
-    tweets, text_tweets = cf.parse('../Dataset/tweets_A.txt')
+    tweets, text_tweets = cf.parse('../data/tweets_A.txt')
     # tweets = tweets[:5000]
     print('len(tweets) =', len(tweets))
 
