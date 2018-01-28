@@ -4,10 +4,14 @@ import utils
 
 
 class Tweet:
-    def __init__(self, features, id, user):
+    def __init__(self, features, id, user, timestamp, links, hashtags, tags):
         self.features = features
         self.id = id
         self.user = user
+        self.timestamp = timestamp
+        self.links = links
+        self.hashtags = hashtags
+        self.tags = tags
 
 
 def stopwords():
@@ -50,6 +54,18 @@ def stopwords():
     return stop_words
 
 
+def links(text):
+    return re.findall('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', text)
+
+
+def tags(text):
+    return re.findall('@[^\s]+', text)
+
+
+def hashtags(text):
+    return re.findall('#[^\s]+', text)
+
+
 def normalize_text(text):
     text = re.sub('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', '', text)
     text = re.sub('@[^\s]+', '', text)
@@ -69,7 +85,7 @@ def nltk_tokenize(stop_words, text, ps):
     return features
 
 
-def parse(filename, num=5000):
+def parse(filename, num):
     file_object = open(filename, 'r')
     tweets = []
     text_tweets = []
@@ -77,11 +93,12 @@ def parse(filename, num=5000):
     id = 0
     ps = nltk.PorterStemmer()
     for line in file_object:
-        username, text = line.split('\t\t')
-        text = normalize_text(str(text))
-        features = nltk_tokenize(stop_words, text, ps)
-        tweet = Tweet(features, id, username)
+        username, timestamp, text = line.split('\t\t')
+        n_text = normalize_text(str(text))
+        features = nltk_tokenize(stop_words, n_text, ps)
         if len(features) > 2:
+            tweet = Tweet(features, id, username, timestamp,
+                          links(text), hashtags(text), tags(text))
             tweets.append(tweet)
             text_tweets.append(features)
             id = id+1

@@ -1,5 +1,6 @@
 import utils
 import common_functions as cf
+import lsh_approach as lsh
 import argparse
 
 
@@ -13,19 +14,25 @@ def main():
                         default=[5], type=int)
     parser.add_argument('--correlation', '-c', nargs=1,
                         default=[1], type=int)
+    parser.add_argument('--lsh-approach', '-lsh', action="store_true")
     args = parser.parse_args()
     distance = args.distance[0]
     min_size = args.min_cluster_size[0]
     tweets_len = args.tweets_number[0]
     correlation = args.correlation[0]
+    lsh_approach = args.lsh_approach
 
     # Parse tweets
-    tweets, text_tweets = cf.parse('../data/tweets_A.txt', tweets_len)
+    tweets, text_tweets = cf.parse('../data/tweets_2xuser_time_A.txt',
+                                   tweets_len)
     tweets_len = len(tweets)
     print('len(tweets) =', tweets_len)
 
     # Clustering
-    T = utils.clustering(text_tweets, distance)
+    if lsh_approach:
+        T = lsh.clustering(tweets, text_tweets, distance)
+    else:
+        T = utils.clustering(text_tweets, distance)
 
     # Remove small clusters
     cluster = {}
@@ -58,6 +65,7 @@ def main():
 
     # Print configuration
     print()
+    print('LSH approach (-lsh) =', lsh_approach)
     print('initial number of tweets (-n) =', tweets_len)
     print('distance (-d) =', distance)
     print('cluster min size (-s) =', min_size)

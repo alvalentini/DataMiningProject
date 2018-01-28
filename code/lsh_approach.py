@@ -6,10 +6,6 @@ import operator
 import common_functions as cf
 import itertools as it
 import utils as ut
-import argparse
-
-# from nltk.stem import PorterStemmer
-# from nltk.tokenize import sent_tokenize, word_tokenize
 
 
 def dictionary_creation(tweets):
@@ -137,7 +133,7 @@ def compute_minHash(matrix, hashIterations):
     return signature_matrix
 
 
-def lsh_clustering(tweets, text_tweets, distance):
+def clustering(tweets, text_tweets, distance):
     words = dictionary_creation(tweets)
 
     matrix = initialize_matrix(tweets, words)
@@ -153,49 +149,3 @@ def lsh_clustering(tweets, text_tweets, distance):
     candidates_lists = get_candidates_lsh(signature_matrix, b, r, k)
 
     return ut.clustering_lsh(text_tweets, candidates_lists, distance)
-
-
-def main():
-    # Command line parser
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--distance', '-d', nargs=1, default=[2.0], type=float)
-    parser.add_argument('--tweets-number', '-n', nargs=1,
-                        default=[5000], type=int)
-    parser.add_argument('--min-cluster-size', '-s', nargs=1,
-                        default=[5], type=int)
-    args = parser.parse_args()
-    distance = args.distance[0]
-    min_size = args.min_cluster_size[0]
-    tweets_len = args.tweets_number[0]
-
-    # Parse tweets
-    tweets, text_tweets = cf.parse('../data/tweets_A.txt', tweets_len)
-    tweets_len = len(tweets)
-    print('len(tweets) =', tweets_len)
-
-    # Clustering
-    T = lsh_clustering(tweets, text_tweets, distance)
-
-    # Remove small clusters
-    cluster = {}
-    for i in range(len(T)):
-        if T[i] not in cluster:
-            cluster[T[i]] = []
-        cluster[T[i]].append(i)
-    for k, v in cluster.copy().items():
-        if len(v) < min_size:
-            cluster.pop(k)
-
-    # Evaluation
-    cf.evaluation(cluster, tweets)
-
-    # Print configuration
-    print()
-    print('initial number of tweets (-n) =', tweets_len)
-    print('distance (-d) =', distance)
-    print('cluster min size (-s) =', min_size)
-
-
-if __name__ == "__main__":
-    # execute only if run as a script
-    main()
