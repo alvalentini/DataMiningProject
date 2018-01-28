@@ -133,7 +133,7 @@ def compute_minHash(matrix, hashIterations):
     return signature_matrix
 
 
-def clustering(tweets, text_tweets, distance):
+def clustering(tweets, t, distance):
     words = dictionary_creation(tweets)
 
     matrix = initialize_matrix(tweets, words)
@@ -148,4 +148,4 @@ def clustering(tweets, text_tweets, distance):
 
     candidates_lists = get_candidates_lsh(signature_matrix, b, r, k)
 
-    return ut.clustering_lsh(text_tweets, candidates_lists, distance)
+    return ut.clustering_lsh(t[0], t[1], t[2], t[3], candidates_lists, distance)

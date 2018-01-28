@@ -57,15 +57,15 @@ def stopwords():
 
 
 def links(text):
-    return re.findall('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', text)
+    return list(re.findall('(?P<url>https?://[^\s]+)', text))
 
 
 def tags(text):
-    return re.findall('@[^\s]+', text)
+    return list(re.findall('@[^\s]+', text))
 
 
 def hashtags(text):
-    return re.findall('#[^\s]+', text)
+    return list(re.findall('#[^\s]+', text))
 
 
 def normalize_text(text):
@@ -90,7 +90,10 @@ def nltk_tokenize(stop_words, text, ps):
 def parse(filename, num):
     file_object = open(filename, 'r')
     tweets = []
-    text_tweets = []
+    features_tweets = []
+    links_tweets = []
+    hashtags_tweets = []
+    tags_tweets = []
     stop_words = stopwords()
     id = 0
     ps = nltk.PorterStemmer()
@@ -104,11 +107,15 @@ def parse(filename, num):
             tweet = Tweet(features, id, username, timestamp,
                           links(text), hashtags(text), tags(text))
             tweets.append(tweet)
-            text_tweets.append(features)
+            features_tweets.append(features)
+            links_tweets.append(tweet.links)
+            hashtags_tweets.append(tweet.hashtags)
+            tags_tweets.append(tweet.tags)
             id = id+1
         if id == num:
             break
-    return tweets, text_tweets
+    t = (features_tweets, links_tweets, hashtags_tweets, tags_tweets)
+    return tweets, t
 
 
 def evaluation(cluster, tweets):
@@ -154,7 +161,7 @@ def evaluation(cluster, tweets):
         dist = d/sim
         cluster_words = []
         for w, f in map.items():
-            if f >= v_len*(2/3):
+            if f >= v_len*(1/2):
                 cluster_words.append(w)
         clusters.append((k, cluster_words, v_len, dist, 0, cluster_users, day))
 
