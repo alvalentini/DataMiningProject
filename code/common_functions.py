@@ -1,13 +1,19 @@
 import nltk
 import re
 import utils
+import time
+import datetime
 
 
 class Tweet:
-    def __init__(self, features, id, user):
+    def __init__(self, features, id, user, timestamp, links, hashtags, tags):
         self.features = features
         self.id = id
         self.user = user
+        self.timestamp = timestamp
+        self.links = links
+        self.hashtags = hashtags
+        self.tags = tags
 
 
 def stopwords():
@@ -50,6 +56,18 @@ def stopwords():
     return stop_words
 
 
+def links(text):
+    return re.findall('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', text)
+
+
+def tags(text):
+    return re.findall('@[^\s]+', text)
+
+
+def hashtags(text):
+    return re.findall('#[^\s]+', text)
+
+
 def normalize_text(text):
     text = re.sub('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', '', text)
     text = re.sub('@[^\s]+', '', text)
@@ -57,7 +75,7 @@ def normalize_text(text):
     return text
 
 
-def nltk_tokenize(stop_words, text):
+def nltk_tokenize(stop_words, text, ps):
     tokens = []
     features = []
     tokens = text.split()
@@ -65,22 +83,26 @@ def nltk_tokenize(stop_words, text):
         word_lower = word.lower()
         word_len = len(word)
         if word_lower not in stop_words and word_len > 2 and word_len < 20 and not bool(re.match('.*(a{3,}|b{3,}|c{3,}|d{3,}|e{3,}|f{3,}|g{3,}|h{3,}|i{3,}|j{3,}|k{3,}|l{3,}|m{3,}|n{3,}|o{3,}|p{3,}|q{3,}|r{3,}|s{3,}|t{3,}|u{3,}|v{3,}|w{3,}|x{3,}|y{3,}|z{3,}).*', word_lower)):
-            features.append(word.lower())
+            features.append(ps.stem(word.lower()))
     return features
 
 
-def parse(filename, num=5000):
+def parse(filename, num):
     file_object = open(filename, 'r')
     tweets = []
     text_tweets = []
     stop_words = stopwords()
     id = 0
+    ps = nltk.PorterStemmer()
     for line in file_object:
-        username, text = line.split('\t\t')
-        text = normalize_text(str(text))
-        features = nltk_tokenize(stop_words, text)
-        tweet = Tweet(features, id, username)
+        username, date, text = line.split('\t\t')
+        n_text = normalize_text(str(text))
+        features = nltk_tokenize(stop_words, n_text, ps)
         if len(features) > 2:
+            date = date.split()[0]
+            timestamp = time.mktime(datetime.datetime.strptime(date, '%Y-%m-%d').timetuple())
+            tweet = Tweet(features, id, username, timestamp,
+                          links(text), hashtags(text), tags(text))
             tweets.append(tweet)
             text_tweets.append(features)
             id = id+1
@@ -98,8 +120,26 @@ def evaluation(cluster, tweets):
         v_len = len(v)
         tweets_num += v_len
         cluster_tweets = []
+        cluster_users = set([])
+        time_distribution = {}
         for t in v:
-            cluster_tweets.append(tweets[t].features)
+            tweet = tweets[t]
+            if tweet.timestamp not in time_distribution:
+                time_distribution[tweet.timestamp] = 1
+            else:
+                time_distribution[tweet.timestamp] += 1
+            cluster_tweets.append(tweet.features)
+            cluster_users.add(tweet.user)
+        day = None
+        t = 0
+        max = (0, 0)
+        for d, n in time_distribution.items():
+            t += n
+            if n > max[1]:
+                max = d, n
+        average = t/len(time_distribution)
+        if max[1] >= (average*1.5):
+            day = max[0]
         sim = 0
         d = 0
         map = {}
@@ -116,7 +156,7 @@ def evaluation(cluster, tweets):
         for w, f in map.items():
             if f >= v_len*(2/3):
                 cluster_words.append(w)
-        clusters.append((k, cluster_words, v_len, dist, 0))
+        clusters.append((k, cluster_words, v_len, dist, 0, cluster_users, day))
 
     # Compute the smaller external distance
     c_len = len(clusters)
@@ -124,16 +164,21 @@ def evaluation(cluster, tweets):
         for j in range(i+1, c_len):
             sim = utils.similarity(clusters[i][1], clusters[j][1])
             if sim > clusters[i][4]:
-                clusters[i] = clusters[i][0], clusters[i][1], clusters[i][2], clusters[i][3], 1/sim
+                clusters[i] = clusters[i][0], clusters[i][1], clusters[i][2], clusters[i][3], 1/sim, clusters[i][5], clusters[i][6]
             if sim > clusters[j][4]:
-                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim
+                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim, clusters[i][5], clusters[i][6]
 
     # Print results
     bugs = 0
     for i in range(c_len):
         print('Cluster:', clusters[i][0])
         print(clusters[i][1])
+        print(clusters[i][5])
         print('cluster size:', clusters[i][2])
+        if clusters[i][6] is None:
+            print('cluster date: None')
+        else:
+            print('cluster date:', datetime.datetime.fromtimestamp(clusters[i][6]).strftime('%Y-%m-%d'))
         print('average internal distance:', '%.1f' % clusters[i][3])
         if clusters[i][4] == 0:
             print('smaller external distance: +inf')
@@ -148,3 +193,6 @@ def evaluation(cluster, tweets):
     print('number of clusters =', c_len)
     print('tweets in the clusters =', tweets_num)
     print('bugs =', bugs)
+    print()
+
+    return clusters

@@ -59,24 +59,15 @@ map<string, double> distances(vector<vector<string> > a) {
 }
 
 vector<size_t> clustering(vector<vector<string> > a, double max_d) {
-  map<double, set<pair<size_t, size_t> > > distances;
   size_t c1 = 0;
   size_t c2 = 0;
+  set<pair<size_t, size_t> > s;
   for (size_t i=0; i<a.size(); i++) {
     for (size_t j=i+1; j<a.size(); j++) {
       double sim = jaccard_similarity(a[i], a[j]);
       if (sim != 0 && sim >= 1/max_d) {
-        double d = 1/sim;
         pair<size_t, size_t> p = make_pair(i, j);
-        auto it = distances.find(d);
-        if (it == distances.end()) {
-          set<pair<size_t, size_t> > s;
-          s.insert(p);
-          distances[d] = s;
-        }
-        else {
-          it->second.insert(p);
-        }
+        s.insert(p);
         c2++;
       }
       c1++;
@@ -90,107 +81,68 @@ vector<size_t> clustering(vector<vector<string> > a, double max_d) {
   for (size_t i=0; i<a.size(); i++) {
     res.push_back(i);
   }
-  while(distances.size() > 0) {
-    auto distances_it = distances.begin();
-    size_t d = distances_it->first;
-    if (d <= max_d) {
-      set<pair<size_t, size_t> >& s = distances_it->second;
-      auto it = s.begin();
-      s.erase(it);
-      pair<size_t, size_t> p = *it;
-      if (s.size() == 0) {
-        distances.erase(distances_it);
-      }
-      size_t i = p.first;
-      size_t j = p.second;
-      size_t r = res[j];
-      if (r != res[i]) {
-        for (size_t k=0; k<res.size(); k++) {
-          if (res[k] == r) {
-            res[k] = res[i];
-          }
+  while(s.size() > 0) {
+    auto it = s.begin();
+    s.erase(it);
+    pair<size_t, size_t> p = *it;
+    size_t i = p.first;
+    size_t j = p.second;
+    size_t r = res[j];
+    if (r != res[i]) {
+      for (size_t k=0; k<res.size(); k++) {
+        if (res[k] == r) {
+          res[k] = res[i];
         }
       }
-    }
-    else {
-      break;
     }
   }
   cout << "End C++" << endl << endl;
   return res;
 }
 
-vector<size_t> clustering_lsh(vector<vector<string> > a, set<string> pairs, double max_d) {
-  map<double, set<pair<size_t, size_t> > > distances;
+vector<size_t> clustering_lsh(vector<vector<string> > a, vector<vector<size_t> > candidates_lists, double max_d) {
+  cout << "Start c++" << endl;
   size_t c1 = 0;
   size_t c2 = 0;
-  cout << "Start c++" << endl;
-  for (auto pa : pairs) {
-    std::stringstream ss(pa);
-    std::vector<size_t> vect;
-    size_t z;
-    size_t i;
-    size_t j;
-    while (ss >> z) {
-      vect.push_back(z);
-      if (ss.peek() == ';') {
-        ss.ignore();
+  set<pair<size_t, size_t> > s;
+  for (auto& list : candidates_lists) {
+    for (size_t x = 0; x < list.size()-1; x++){
+      for (size_t y = x+1; y < list.size(); y++){
+        size_t i = list[x];
+	size_t j = list[y];
+        pair<size_t, size_t> p = make_pair(i, j);
+        double sim = jaccard_similarity(a[i], a[j]);
+        if (sim != 0 && sim >= 1/max_d) {
+          s.insert(p);
+          c2++;
+        }
+        c1++;
+        if (c1 % 1000000 == 0) {
+          cout << "Computed " << c1 << " jaccard similarities" << endl;
+        }
       }
-    }
-    i = vect[0];
-    j = vect[1];
-    double sim = jaccard_similarity(a[i], a[j]);
-    if (sim != 0 && sim >= 1/max_d) {
-      double d = 1/sim;
-      pair<size_t, size_t> p = make_pair(i, j);
-      auto it = distances.find(d);
-      if (it == distances.end()) {
-        set<pair<size_t, size_t> > s;
-        s.insert(p);
-        distances[d] = s;
-      }
-      else {
-        it->second.insert(p);
-      }
-      c2++;
-    }
-    c1++;
-    if (c1 % 10000 == 0) {
-      cout << "Computed " << c1 << " jaccard similarities" << endl;
     }
   }
-  cout << "All distances computed! " << c2 << ", "
-       << distances.size() << endl;
+  cout << "All distances computed! " << c2 << endl;
   vector<size_t> res;
   for (size_t i=0; i<a.size(); i++) {
     res.push_back(i);
   }
-  while(distances.size() > 0) {
-    auto distances_it = distances.begin();
-    size_t d = distances_it->first;
-    if (d <= max_d) {
-      set<pair<size_t, size_t> >& s = distances_it->second;
-      auto it = s.begin();
-      s.erase(it);
-      pair<size_t, size_t> p = *it;
-      if (s.size() == 0) {
-        distances.erase(distances_it);
-      }
-      size_t i = p.first;
-      size_t j = p.second;
-      size_t r = res[j];
-      if (r != res[i]) {
-        for (size_t k=0; k<res.size(); k++) {
-          if (res[k] == r) {
-            res[k] = res[i];
-          }
+  while(s.size() > 0) {
+    auto it = s.begin();
+    s.erase(it);
+    pair<size_t, size_t> p = *it;
+    size_t i = p.first;
+    size_t j = p.second;
+    size_t r = res[j];
+    if (r != res[i]) {
+      for (size_t k=0; k<res.size(); k++) {
+        if (res[k] == r) {
+          res[k] = res[i];
         }
       }
     }
-    else {
-      break;
-    }
   }
-  cout << "end" << endl;
+  cout << "End C++" << endl << endl;
   return res;
 }
