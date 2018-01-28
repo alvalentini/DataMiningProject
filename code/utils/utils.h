@@ -9,4 +9,4 @@ std::map<std::string, double> distances(std::vector<std::vector<std::string> > a
 
 std::vector<std::size_t> clustering(std::vector<std::vector<std::string> > a, double max_d);
 
-std::vector<std::size_t> clustering_lsh(std::vector<std::vector<std::string> > a, std::vector<std::vector<std::string> > candidates_lists, double max_d);
+std::vector<std::size_t> clustering_lsh(std::vector<std::vector<std::string> > a, std::vector<std::vector<std::size_t> > candidates_lists, double max_d);

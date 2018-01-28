@@ -6,6 +6,7 @@ import operator
 import common_functions as cf
 import itertools as it
 import utils as ut
+import argparse
 
 # from nltk.stem import PorterStemmer
 # from nltk.tokenize import sent_tokenize, word_tokenize
@@ -67,22 +68,22 @@ def generate_signatures(matrix, rows_hashes):
             print("i finished computing minhash of tweet number:" + str(tweet))
     return signature_matrix
 
-    
-def extract_buckets_to_combine(buckets):            
+
+def extract_buckets_to_combine(buckets):
     tuples = set()
     for bucket in buckets:
         for hash_list in bucket.values():
-            if len(hash_list)>1:
+            if len(hash_list) > 1:
                 tuples.add(tuple(hash_list))
     lists = []
     for t in tuples:
         lists.append(list(t))
-        
+
     res = []
     for l in lists:
         string_list = []
         for number in l:
-            string_list.append(str(number))
+            string_list.append(number)
         res.append(string_list)
     return res
 
@@ -104,9 +105,8 @@ def get_candidates_lsh(signature_matrix, b, r, k):
         buckets.append(hashtable)
     print("Buckets done")
 
-    candidates_lists_to_combine = extract_buckets_to_combine(buckets)
-    return candidates_lists_to_combine
-    
+    return extract_buckets_to_combine(buckets)
+
     # similarity_threshold = 10
 
 
@@ -137,11 +137,7 @@ def compute_minHash(matrix, hashIterations):
     return signature_matrix
 
 
-def main():
-    tweets, text_tweets = cf.parse('../data/tweets_A.txt')
-    # tweets = tweets[:5000]
-    print('len(tweets) =', len(tweets))
-
+def lsh_clustering(tweets, text_tweets, distance):
     words = dictionary_creation(tweets)
 
     matrix = initialize_matrix(tweets, words)
@@ -155,78 +151,51 @@ def main():
     k = 1000000000
 
     candidates_lists = get_candidates_lsh(signature_matrix, b, r, k)
-    
-    T = ut.clustering_lsh(text_tweets, candidates_lists, 5)
 
-    cluster_list = []
+    return ut.clustering_lsh(text_tweets, candidates_lists, distance)
+
+
+def main():
+    # Command line parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--distance', '-d', nargs=1, default=[2.0], type=float)
+    parser.add_argument('--tweets-number', '-n', nargs=1,
+                        default=[5000], type=int)
+    parser.add_argument('--min-cluster-size', '-s', nargs=1,
+                        default=[5], type=int)
+    args = parser.parse_args()
+    distance = args.distance[0]
+    min_size = args.min_cluster_size[0]
+    tweets_len = args.tweets_number[0]
+
+    # Parse tweets
+    tweets, text_tweets = cf.parse('../data/tweets_A.txt', tweets_len)
+    tweets_len = len(tweets)
+    print('len(tweets) =', tweets_len)
+
+    # Clustering
+    T = lsh_clustering(tweets, text_tweets, distance)
+
+    # Remove small clusters
+    cluster = {}
     for i in range(len(T)):
-        cluster_list.append((i, T[i]))
-    cluster_list.sort(key=lambda x: x[1])
+        if T[i] not in cluster:
+            cluster[T[i]] = []
+        cluster[T[i]].append(i)
+    for k, v in cluster.copy().items():
+        if len(v) < min_size:
+            cluster.pop(k)
 
-    last_t = -1
-    for i, t in cluster_list:
-        if (t != last_t):
-            print()
-        print(t, i, tweets[i].features)
-        last_t = t
+    # Evaluation
+    cf.evaluation(cluster, tweets)
 
-    print('\nnumber of cluster', len(set(T)))
-    clusters = {}
-    for tweet_cluster in cluster_list:
-        if not tweet_cluster[1] in clusters:
-            clusters[tweet_cluster[1]] = [tweet_cluster[0]]
-        else:
-            clusters[tweet_cluster[1]].append(tweet_cluster[0])
-    meaningful_clusters = dict(clusters)
-    for key in clusters.keys():
-        if len(clusters[key]) < 10:
-            del meaningful_clusters[key]
-    # else:
-    #    print("Wrong b and c parameters")
-
-    # signature_matrix = generate_signatures_with_sorted_rows(matrix, rows_)
-    # signature_matrix = compute_minHash(matrix, hashIterations)
+    # Print configuration
+    print()
+    print('initial number of tweets (-n) =', tweets_len)
+    print('distance (-d) =', distance)
+    print('cluster min size (-s) =', min_size)
 
 
 if __name__ == "__main__":
     # execute only if run as a script
     main()
-
-
-'''
-def generate_orderedHashFunctions(n_hashFunctions, n_rows):
-    hashes_to_rows={}
-    for h in range(n_hashFunctions):
-        random.seed(h)
-        hashes_to_rows[h] = []
-        for row in range(n_rows):
-            hashes_to_rows[h].append((row, random.randint(0, n_rows)))
-    for h in hashes_to_rows.keys():
-        hashes_to_rows[h].sort(key=operator.itemgetter(1))
-    return hashes_to_rows
-
-# USELESS, it takes more time
-def generate_signatures_with_sorted_rows(matrix, hashes_to_rows):
-    n_tweets = matrix.shape[1]
-    n_words = matrix.shape[0]
-    n_hashes = len(hashes_to_rows)
-    signature_matrix = np.full([n_hashes, n_tweets], sys.maxsize)
-    for tweet in range(n_tweets):
-        for hash_index in range(n_hashes):
-            for pair in hashes_to_rows[hash_index]:
-                if matrix[pair[0], tweet]==1:
-                    signature_matrix[hash_index, tweet] = pair[1]
-                    break
-        print ("i have done the tweet number:" + str(tweet))
-
-
-        for word in rows_hashes:
-            if matrix[word, tweet]==1:
-                for hash_index in range(n_hashes):
-                    hash_value = rows_hashes[word][hash_index]
-                    if hash_value < signature_matrix[hash_index, tweet]:
-                        signature_matrix[hash_index, tweet] = hash_value
-        print ("i have done the tweet number:" + str(tweet))
-
-    return signature_matrix
-'''

@@ -18,6 +18,7 @@ namespace std {
    %template(DoubleVector) vector<double>;
    %template(VecSize) vector<size_t>;
    %template(VectorOfStringVector) vector<vector<string> >;
+   %template(VectorOfVecSize) vector<vector<size_t> >;
    %template(map_string_double) map<string, double>;
 }
 
