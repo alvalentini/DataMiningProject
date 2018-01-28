@@ -52,10 +52,13 @@ def main():
     topic_relation = []
     for i in range(c_len):
         for j in range(i+1, c_len):
-            r = len(set.intersection(*[set(clusters[i][5]),
-                                       set(clusters[j][5])]))
-            if r >= correlation:
+            if clusters[i][6] == clusters[j][6]:
                 topic_relation.append((i, j))
+            else:
+                r = len(set.intersection(*[set(clusters[i][5]),
+                                           set(clusters[j][5])]))
+                if r >= correlation:
+                    topic_relation.append((i, j))
     for i, j in topic_relation:
         print('Cluster:', clusters[i][0])
         print(clusters[i][1])
