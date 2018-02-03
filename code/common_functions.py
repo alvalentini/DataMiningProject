@@ -87,9 +87,10 @@ def nltk_tokenize(stop_words, text, ps):
     return features
 
 
-def parse(filename, num):
+def parse(filename, num, use_metadata):
     file_object = open(filename, 'r')
     tweets = []
+    all_features = []
     features_tweets = []
     links_tweets = []
     hashtags_tweets = []
@@ -104,17 +105,21 @@ def parse(filename, num):
         if len(features) > 2:
             date = date.split()[0]
             timestamp = time.mktime(datetime.datetime.strptime(date, '%Y-%m-%d').timetuple())
-            tweet = Tweet(features, id, username, timestamp,
-                          links(text), hashtags(text), tags(text))
+            if use_metadata:
+                tweet = Tweet(features, id, username, timestamp,
+                              links(text), hashtags(text), tags(text))
+                all_features.append(features+tweet.links+tweet.tags)
+                links_tweets.append(tweet.links)
+                hashtags_tweets.append(tweet.hashtags)
+                tags_tweets.append(tweet.tags)
+            else:
+                tweet = Tweet(features, id, username, timestamp, [], [], [])
             tweets.append(tweet)
             features_tweets.append(features)
-            links_tweets.append(tweet.links)
-            hashtags_tweets.append(tweet.hashtags)
-            tags_tweets.append(tweet.tags)
             id = id+1
         if id == num:
             break
-    t = (features_tweets, links_tweets, hashtags_tweets, tags_tweets)
+    t = (features_tweets, links_tweets, hashtags_tweets, tags_tweets, all_features)
     return tweets, t
 
 
@@ -158,7 +163,10 @@ def evaluation(cluster, tweets):
             for j in range(i+1, v_len):
                 sim += utils.similarity(cluster_tweets[i], cluster_tweets[j])
                 d += 1
-        dist = d/sim
+        if sim == 0:
+            dist = 1000000
+        else:
+            dist = d/sim
         cluster_words = []
         for w, f in map.items():
             if f >= v_len*(1/2):

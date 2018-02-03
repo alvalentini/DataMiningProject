@@ -96,16 +96,26 @@ vector<size_t> clustering(vector<vector<string> > features, vector<vector<string
   size_t c2 = 0;
   set<pair<size_t, size_t> > s;
   size_t t_size = features.size();
+  size_t l_size = links.size();
+  double threshold = 1/max_d;
   for (size_t i=0; i<t_size; i++) {
     for (size_t j=i+1; j<t_size; j++) {
-      double threshold = 1/max_d;
-      if (intersect(links[i], links[j]) ||
-          intersect(hashtags[i], hashtags[j]) ||
-          intersect(tags[i], tags[j]) ||
-          jaccard_similarity(features[i], features[j]) >= threshold) {
-        pair<size_t, size_t> p = make_pair(i, j);
-        s.insert(p);
-        c2++;
+      if (l_size > 0) {
+        if (intersect(links[i], links[j]) ||
+            intersect(hashtags[i], hashtags[j]) ||
+            intersect(tags[i], tags[j]) ||
+            jaccard_similarity(features[i], features[j]) >= threshold) {
+          pair<size_t, size_t> p = make_pair(i, j);
+          s.insert(p);
+          c2++;
+        }
+      }
+      else {
+        if (jaccard_similarity(features[i], features[j]) >= threshold) {
+          pair<size_t, size_t> p = make_pair(i, j);
+          s.insert(p);
+          c2++;
+        }
       }
       c1++;
       if (c1 % 1000000 == 0) {
@@ -125,19 +135,29 @@ vector<size_t> clustering_lsh(vector<vector<string> > features, vector<vector<st
   size_t c2 = 0;
   set<pair<size_t, size_t> > s;
   size_t t_size = features.size();
+  size_t l_size = links.size();
+  double threshold = 1/max_d;
   for (auto& list : candidates_lists) {
     for (size_t x = 0; x < list.size()-1; x++){
       for (size_t y = x+1; y < list.size(); y++){
         size_t i = list[x];
 	size_t j = list[y];
-        double threshold = 1/max_d;
-        if (intersect(links[i], links[j]) ||
-            intersect(hashtags[i], hashtags[j]) ||
-            intersect(tags[i], tags[j]) ||
-            jaccard_similarity(features[i], features[j]) >= threshold) {
-          pair<size_t, size_t> p = make_pair(i, j);
-          s.insert(p);
-          c2++;
+        if (l_size > 0) {
+          if (intersect(links[i], links[j]) ||
+              intersect(hashtags[i], hashtags[j]) ||
+              intersect(tags[i], tags[j]) ||
+              jaccard_similarity(features[i], features[j]) >= threshold) {
+            pair<size_t, size_t> p = make_pair(i, j);
+            s.insert(p);
+            c2++;
+          }
+        }
+        else {
+          if (jaccard_similarity(features[i], features[j]) >= threshold) {
+            pair<size_t, size_t> p = make_pair(i, j);
+            s.insert(p);
+            c2++;
+          }
         }
         c1++;
         if (c1 % 1000000 == 0) {
