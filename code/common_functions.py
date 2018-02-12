@@ -57,15 +57,15 @@ def stopwords():
 
 
 def links(text):
-    return re.findall('((www\.[^\s]+)|(https?://[^\s]+)|(pic\.twitter\.com/[^\s]+))', text)
+    return list(re.findall('(?P<url>https?://[^\s]+)', text))
 
 
 def tags(text):
-    return re.findall('@[^\s]+', text)
+    return list(re.findall('@[^\s]+', text))
 
 
 def hashtags(text):
-    return re.findall('#[^\s]+', text)
+    return list(re.findall('#[^\s]+', text))
 
 
 def normalize_text(text):
@@ -87,10 +87,14 @@ def nltk_tokenize(stop_words, text, ps):
     return features
 
 
-def parse(filename, num):
+def parse(filename, num, use_metadata):
     file_object = open(filename, 'r')
     tweets = []
-    text_tweets = []
+    all_features = []
+    features_tweets = []
+    links_tweets = []
+    hashtags_tweets = []
+    tags_tweets = []
     stop_words = stopwords()
     id = 0
     ps = nltk.PorterStemmer()
@@ -101,14 +105,22 @@ def parse(filename, num):
         if len(features) > 2:
             date = date.split()[0]
             timestamp = time.mktime(datetime.datetime.strptime(date, '%Y-%m-%d').timetuple())
-            tweet = Tweet(features, id, username, timestamp,
-                          links(text), hashtags(text), tags(text))
+            if use_metadata:
+                tweet = Tweet(features, id, username, timestamp,
+                              links(text), hashtags(text), tags(text))
+                all_features.append(features+tweet.links+tweet.tags)
+                links_tweets.append(tweet.links)
+                hashtags_tweets.append(tweet.hashtags)
+                tags_tweets.append(tweet.tags)
+            else:
+                tweet = Tweet(features, id, username, timestamp, [], [], [])
             tweets.append(tweet)
-            text_tweets.append(features)
+            features_tweets.append(features)
             id = id+1
         if id == num:
             break
-    return tweets, text_tweets
+    t = (features_tweets, links_tweets, hashtags_tweets, tags_tweets, all_features)
+    return tweets, t
 
 
 def evaluation(cluster, tweets):
@@ -151,10 +163,13 @@ def evaluation(cluster, tweets):
             for j in range(i+1, v_len):
                 sim += utils.similarity(cluster_tweets[i], cluster_tweets[j])
                 d += 1
-        dist = d/sim
+        if sim == 0:
+            dist = 1000000
+        else:
+            dist = d/sim
         cluster_words = []
         for w, f in map.items():
-            if f >= v_len*(2/3):
+            if f >= v_len*(1/2):
                 cluster_words.append(w)
         clusters.append((k, cluster_words, v_len, dist, 0, cluster_users, day))
 

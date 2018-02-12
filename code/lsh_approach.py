@@ -12,7 +12,7 @@ def dictionary_creation(tweets):
     count = 0
     words = {}
     for tweet in tweets:
-        for word in tweet.features:
+        for word in tweet:
             if word not in words:
                 words[word] = count
                 count = count + 1
@@ -21,9 +21,11 @@ def dictionary_creation(tweets):
 
 def initialize_matrix(tweets, words):
     matrix = lil_matrix((len(words), len(tweets)), dtype=int)
+    i = 0
     for tweet in tweets:
-        for word in tweet.features:
-            matrix[words[word], tweet.id] = 1
+        for word in tweet:
+            matrix[words[word], i] = 1
+        i += 1
     return matrix
 
 
@@ -133,19 +135,30 @@ def compute_minHash(matrix, hashIterations):
     return signature_matrix
 
 
-def clustering(tweets, text_tweets, distance):
-    words = dictionary_creation(tweets)
+def get_signature_matrix(features):
+    words = dictionary_creation(features)
 
-    matrix = initialize_matrix(tweets, words)
+    matrix = initialize_matrix(features, words)
     # matrix = clean_matrix_from_rare_words(matrix)
 
     n_hashFunctions = 100
     rows_hashes = generate_hashFunctions(n_hashFunctions, matrix.shape[0])
     signature_matrix = generate_signatures(matrix, rows_hashes)
+    return signature_matrix
+
+
+def clustering(tweets, t, distance, use_metadata):
+    features = []
+    if use_metadata:
+        features = t[4]
+        signature = get_signature_matrix(features)
+    else:
+        features = t[0]
+        signature = get_signature_matrix(features)
+
     b = 50
     r = 2
     k = 1000000000
+    candidates_lists = get_candidates_lsh(signature, b, r, k)
 
-    candidates_lists = get_candidates_lsh(signature_matrix, b, r, k)
-
-    return ut.clustering_lsh(text_tweets, candidates_lists, distance)
+    return ut.clustering_lsh(t[0], t[1], t[2], t[3], candidates_lists, distance)
