@@ -181,7 +181,7 @@ def evaluation(cluster, tweets):
             if sim > clusters[i][4]:
                 clusters[i] = clusters[i][0], clusters[i][1], clusters[i][2], clusters[i][3], 1/sim, clusters[i][5], clusters[i][6]
             if sim > clusters[j][4]:
-                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim, clusters[i][5], clusters[i][6]
+                clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim, clusters[j][5], clusters[j][6]
 
     # Print results
     bugs = 0
