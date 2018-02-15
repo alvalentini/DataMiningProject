@@ -183,6 +183,20 @@ def evaluation(cluster, tweets):
             if sim > clusters[j][4]:
                 clusters[j] = clusters[j][0], clusters[j][1], clusters[j][2], clusters[j][3], 1/sim, clusters[j][5], clusters[j][6]
 
+    # Compute Dunn index
+    minInter = 100000000
+    sumIntra = 0.0
+    maxIntra = -1
+    for i in range(c_len):
+        if (clusters[i][4] < minInter and clusters[i][4] != 0):
+            minInter = clusters[i][4]
+        print ('minInter:',minInter)
+        if (clusters[i][3] > maxIntra and clusters[i][3] != 1000000):
+            maxIntra = clusters[i][3]
+        sumIntra += clusters[i][3]
+    dunnIndex = minInter/maxIntra
+    indexWithAverageIntra = minInter/(float(sumIntra)/float(c_len))
+
     # Print results
     bugs = 0
     for i in range(c_len):
@@ -208,6 +222,10 @@ def evaluation(cluster, tweets):
     print('number of clusters =', c_len)
     print('tweets in the clusters =', tweets_num)
     print('bugs =', bugs)
+    print('Dunn index =', dunnIndex)
+    print('indexWithAverageIntra =', indexWithAverageIntra)
+    print('minInter =', minInter)
+    print('maxIntra =', maxIntra)
     print()
 
     return clusters
