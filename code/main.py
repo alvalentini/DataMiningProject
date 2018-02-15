@@ -62,7 +62,7 @@ def main():
             relation_map[i] = set()
         for i in range(c_len):
             for j in range(i+1, c_len):
-                if clusters[i][6] == clusters[j][6]:
+                if clusters[i][6] == clusters[j][6] and clusters[i][6] != None:
                     relation_map[i].add(j)
                     relation_map[j].add(i)
                     topic_relation.append((i, j))

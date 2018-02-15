@@ -150,7 +150,7 @@ def evaluation(cluster, tweets):
             if n > max[1]:
                 max = d, n
         average = t/len(time_distribution)
-        if max[1] >= (average*1.5):
+        if max[1] >= (average*2):
             day = max[0]
         sim = 0
         d = 0
